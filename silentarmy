@@ -165,7 +165,7 @@ class Silentarmy:
     def reconnect(self):
         if self.st_conn_attempt > 0:
             # wait 1 sec before reconnecting
-            yield from asyncio.sleep(1)
+            yield from asyncio.sleep(5)
         self.st_conn_attempt += 1
         info = ""
         if self.st_conn_attempt > 1:
