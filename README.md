@@ -102,18 +102,24 @@ Troubleshooting performance issues:
   all the GPUs in the `--use` option, for example `silentarmy --use 0,1,2`
   if the host has three devices with IDs 0, 1, and 2.
 * If some GPUs have less than ~2.4 GB of GPU memory, run
-  `silentarmy --instances 1 --use ...` (2 instances use ~2.4 GB of GPU memory,
+  `silentarmy --instances 1` (2 instances use ~2.4 GB of GPU memory,
   1 instance uses ~1.2 GB of GPU memory.)
+* If you are using an AMD GPU with the **Radeon Software Crimson Edition**
+  driver, as opposed to the **AMDGPU-PRO** driver, then edit param.h and set
+  `OPTIM_FOR_FGLRX` to 1. This will improve performance by +5% and reduce
+  GPU memory usage from 1.2 GB per instance to 805 MB per instance. But do
+  **not** set it if you are using the AMDGPU-PRO driver or else it will
+  degrade performance by -15% or more.
 * If 1 instance still requires too much memory, edit `param.h` and set
   `NR_ROWS_LOG` to `19` (this reduces the per-instance memory usage to ~670 MB)
   and run with `--instances 1`.
 
 # Dependencies
 
-SILENTARMY has primarily been tested with AMD GPUs on 64-bit Linux with either
-the **AMDGPU-PRO** driver (amdgpu.ko, for newer GPUs) or the **Radeon Software
+SILENTARMY has primarily been tested with AMD GPUs on 64-bit Linux with
+the **AMDGPU-PRO** driver (amdgpu.ko, for newer GPUs) and the **Radeon Software
 Crimson Edition** driver (fglrx.ko, for older GPUs). Its only build
-dependencies are an OpenCL implementation and the libsodium library.
+dependency is an OpenCL implementation.
 
 Installation of the drivers and SDK can be error-prone, so below are
 step-by-step instructions for the AMD OpenCL implementation (**AMD APP SDK**),
@@ -148,7 +154,7 @@ use of Python's `ensure_future()` which requires Python 3.4.4, however Ubuntu
   `$ sudo ./AMD-APP-SDK-v3.0.130.136-GA-linux64.sh`
 
 9. Install compiler dependencies which you will need to compile SILENTARMY:
-  `$ sudo apt-get install build-essential libsodium-dev`
+  `$ sudo apt-get install build-essential`
 
 ## Ubuntu 14.04
 
@@ -248,6 +254,12 @@ supports Equihash parameters 200,9.
 Marc Bevand -- [http://zorinaq.com](http://zorinaq.com)
 
 Donations welcome: t1cVviFvgJinQ4w3C2m2CfRxgP5DnHYaoFC
+
+# Thanks
+
+I would like to thank these persons for their contributions to SILENTARMY,
+in alphabetical order:
+* nerdralph
 
 # License
 

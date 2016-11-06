@@ -500,9 +500,16 @@ void equihash_round(uint round, __global char *ht_src, __global char *ht_dst,
     uint		tlid = get_local_id(0);
     __global uint       *rowptr;
     uint                cnt;
-    uchar               mask;
-    uint                i, j, n;
-    uint                dropped_coll, dropped_stor;
+    uchar		first_words[NR_SLOTS];
+    uchar		mask;
+    uint                i, j;
+    // NR_SLOTS is already oversized (by a factor of OVERHEAD), but we want to
+    // make it even larger
+    ushort		collisions[NR_SLOTS * 3];
+    uint                nr_coll = 0;
+    uint                n;
+    uint		dropped_coll = 0;
+    uint		dropped_stor = 0;
     __global ulong      *a, *b;
     uint		xi_offset;
     // read first words of Xi from the previous (round - 1) hash table
@@ -523,12 +530,41 @@ void equihash_round(uint round, __global char *ht_src, __global char *ht_dst,
     cnt = *rowptr;
     if (cnt == 0) return;
     cnt = min(cnt, (uint)NR_SLOTS); // handle possible overflow in prev. round
-
-    dropped_stor = 0;
+    if (!cnt)
+	// no elements in row, no collisions
+	return ;
+#if NR_ROWS_LOG != 20 || !OPTIM_FOR_FGLRX
+    p += xi_offset;
+    for (i = 0; i < cnt; i++, p += SLOT_LEN)
+        first_words[i] = *(__global uchar *)p;
+#endif
+    // find collisions
     for (i = 0; i < cnt; i++)
         for (j = i + 1; j < cnt; j++)
-        // XOR colliding pairs of Xi
+#if NR_ROWS_LOG != 20 || !OPTIM_FOR_FGLRX
+            if ((first_words[i] & mask) ==
+		    (first_words[j] & mask))
+              {
+                // collision!
+                if (nr_coll >= sizeof (collisions) / sizeof (*collisions))
+                    dropped_coll++;
+                else
+#if NR_SLOTS <= (1 << 8)
+                    // note: this assumes slots can be encoded in 8 bits
+                    collisions[nr_coll++] =
+			((ushort)j << 8) | ((ushort)i & 0xff);
+#else
+#error "unsupported NR_SLOTS"
+#endif
+              }
+    // XOR colliding pairs of Xi
+    for (n = 0; n < nr_coll; n++)
       {
+        i = collisions[n] & 0xff;
+        j = collisions[n] >> 8;
+#else
+      {
+#endif
         a = (__global ulong *)
             (ht_src + tid * NR_SLOTS * SLOT_LEN + i * SLOT_LEN + xi_offset);
         b = (__global ulong *)
