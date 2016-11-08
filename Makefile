@@ -4,7 +4,7 @@ OPENCL_HEADERS = "/opt/AMDAPPSDK-3.0/include"
 # lets you adds one more directory to the search path.
 LIBOPENCL = "/opt/amdgpu-pro/lib/x86_64-linux-gnu"
 
-CC = gcc
+CC = gcc -O2
 CPPFLAGS = -std=gnu99 -pedantic -Wextra -Wall -ggdb \
     -Wno-deprecated-declarations \
     -Wno-overlength-strings \
