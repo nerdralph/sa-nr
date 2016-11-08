@@ -1,7 +1,16 @@
 # Current tip
 
-* Add nerdralph's optimization (OPTIM_FOR_FGLRX)
+* Update README.md with Nvidia performance numbers
+* Fix mining on Xeon Phi and CPUs (fix OpenCL warnings)
+
+# Version 4 (08 Nov 2016)
+
+* Add Nvidia GPU support (fix more unaligned memory accesses)
+* Add nerdralph's optimization (OPTIM_SIMPLIFY_ROUND) for potential +30%
+  speedup, especially useful on Nvidia GPUs
+* Drop the Python 3.5 dependency; now requires only Python 3.3 or above (lhl)
 * Drop the libsodium dependency; instead use our own SHA256 implementation
+* Add nicehash compatibility (stratum servers fixing 17 bytes of the nonce)
 * Only apply set_target to *next* mining job
 * Do not abandon previous mining jobs if clean_jobs is false
 * Fix KeyError's when displaying stats
