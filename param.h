@@ -32,7 +32,7 @@
 #elif NR_ROWS_LOG == 20 && OPTIM_FOR_FGLRX
 #define OVERHEAD                        6
 #elif NR_ROWS_LOG == 20
-#define OVERHEAD                        6
+#define OVERHEAD                        9
 #endif
 
 #define NR_ROWS                         (1 << NR_ROWS_LOG)
@@ -63,7 +63,7 @@
 // instructions. 10 is the max supported by the hw.
 #define BLAKE_WPS               	10
 // Maximum number of solutions reported by kernel to host
-#define MAX_SOLS			2000
+#define MAX_SOLS			500
 // Length of SHA256 target
 #define SHA256_TARGET_LEN               (256 / 8)
 
